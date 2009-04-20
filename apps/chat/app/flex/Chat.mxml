@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+  xmlns:mx="http://www.adobe.com/2006/mxml" 
+  xmlns:cp="imo.components.*" 
+  xmlns="http://mate.asfusion.com/"
+  creationComplete="init()">
+  
+  <mx:Style source="chat.css" />
+  
+  <mx:Script>
+    <![CDATA[
+      import flash.events.MouseEvent;
+      
+      private function init():void {
+        trace("index");
+        messageService.index();
+      }
+      
+      private function onMessageClick(event:MouseEvent):void {
+        sendMessage();
+        trace("send message");
+        messageService.index;
+      }
+      
+      private function sendMessage():void {
+        chatRoom.htmlText = chatRoom.htmlText + messageInput.htmlText;
+        messageInput.htmlText = "";
+      }
+      
+      private function messagesLoaded(data:Object):void {
+        trace("reading data:");
+        trace(data);
+      }
+      
+      private function serviceFault(data:Object):void {
+        trace("something wrong");
+        trace(data);
+      }
+    ]]>
+  </mx:Script>
+  
+  <mx:HBox>
+    <mx:VBox>
+      <mx:TextArea id="chatRoom" width="680" height="400" />
+  
+      <mx:HBox>
+        <mx:TextInput id="messageInput" width="620" />
+        <mx:Button id="messageButton" label="Send" click="onMessageClick(event)" />
+      </mx:HBox>
+    </mx:VBox>
+    
+    <mx:List />
+  </mx:HBox>
+  
+  <mx:RemoteObject
+    id="messageService"
+    destination="rubyamf"
+    endpoint="http://localhost:3000/amf_gateway"
+    source="MessagesController"
+    showBusyCursor="true"
+    fault="serviceFault(event)">
+    <mx:method name="index" result="messagesLoaded(event)" />
+  </mx:RemoteObject>
+  
+</mx:Application>
